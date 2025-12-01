@@ -1,202 +1,181 @@
-✨ AVR Bare-Metal SPI Communication Project
 
-Ultra-Low-Power Host–Client Communication using AVR DD Series
+# ⚡AVR Bare Metal SPI Communication Project
 
-🚀 Overview
+_Low-power, bare-metal AVR DD project enabling seamless SPI communication between two microcontrollers with ADC sensing and USART output
 
-This project implements ultra-low-power SPI communication between two AVR DD microcontrollers.
-The HOST reads ADC sensor data and sends it to the CLIENT, which prints the result via USART.
+---
 
-🔧 Features
+## 📌 Table of Contents
+- <a href="#overview">Overview</a>
+- <a href="#Key features">Key features</a>
+- <a href="#Hardware requirements">Hardware requirements</a>
+- <a href="#Wiring diagram">Wiring diagram</a>
+- <a href="#Software Structure">Software Structure</a>
+- <a href="#SPI data packet format">SPI data packet format</a>
+- <a href="#Power consumption">Power consumption</a>
+- <a href="#Building the project">Building the project</a>
+- <a href="#Testing">Testing</a>
+- <a href="#Troubleshoot">Troubleshoot</a>
+- <a href="#File structure">File structure</a>
+- <a href="#author--contact">Author & Contact</a>
 
-⚡ Ultra-low power (~1.5 µA sleep current)
+---
+<h2><a class="anchor" id="overview"></a>Overview</h2>
 
-🧠 State-machine architecture
+This project implements ultra-low-power communication between two AVR DD microcontrollers using SPI protocol. The HOST device reads an ADC sensor and transmits data to the CLIENT device, which outputs the results via USART.
+---
+<h2><a class="anchor" id="Key features"></a>Key features</h2>
 
-🔄 Dynamic clock switching (32.768 kHz ↔ 4 MHz)
+-Ultra-low power consumption (~1.5µA sleep current)
+-State machine-based architecture
+-Dynamic clock switching (32.768 kHz ↔ 4 MHz)
+-Window comparison ADC
+-Interrupt-driven SPI communication
 
-🎯 ADC Window Comparison
+---
+<h2><a class="anchor" id="Hardware requirements"></a>Hardware requirements</h2>
 
-🔗 Interrupt-driven SPI communication
+Both Devices:
 
-🛠 Hardware Requirements
-📌 Boards
+-2x AVR DD Curiosity Nano Development Boards
+-USB cables for programming and power
+-Logic analyzer (optional, for debugging)
 
-2× AVR DD Curiosity Nano
+HOST Device Additional:
 
-USB cables
+-Analog sensor (connected to PF2)
+-Button switch (built-in on PF6)
+---
 
-Optional: Logic analyzer
+<h2><a class="anchor" id="Wiring diagram"></a>Wiring diagram</h2>
 
-📌 HOST Extras
+<span style="color:gray">
 
-Analog sensor → PF2
 
-Built-in button → PF6
-
-📡 Wiring Diagram
-HOST (PA4-PA7)  ←→  CLIENT (PA4-PA7)
-    PA4 (MOSI)  →   PA4 (MOSI)
-    PA5 (MISO)  ←   PA5 (MISO)
-    PA6 (SCK)   →   PA6 (SCK)
-    PA7 (SS)    →   PA7 (SS)
-    GND         ←→  GND
-
-HOST Sensor:
-    PC3         →   Sensor VCC
-    PC2         →   Sensor GND
-    PF2         ←   Sensor Analog Out
-
-🧩 Software Architecture
-🟦 HOST State Machine
-
-INIT
-
-SLEEP
-
-SWITCH_TO_HIGHSPEED
-
-READ_ADC
-
-SEND_SPI
-
-SWITCH_TO_LOWPOWER
-
-SLEEP
-
-🟩 CLIENT State Machine
-
-INIT
-
-SLEEP
-
-SWITCH_TO_HIGHSPEED
-
-RECEIVE_SPI
-
-SWITCH_TO_LOWPOWER
-
-WRITE_TO_USART
-
-SLEEP
-
-📦 SPI Packet Format
-Byte 1: [W][A11][A10][A9][A8][A7][A6][A5]
-Byte 0: [A4][A3][A2][A1][A0][X][X][X]
-
-
-W = Window Compare Flag
-
-A11–A0 = ADC Value
-
-X = Reserved
-
-🔋 Power Consumption Summary
-Device	State	Current	Clock
-HOST	Sleep	1.5 µA	32.768 kHz
-HOST	ADC	160 µA	4 MHz
-HOST	SPI TX	1.3 mA	4 MHz
-CLIENT	Sleep	2 µA	32.768 kHz
-CLIENT	SPI RX + USART	1.1 mA	4 MHz
-🧱 Building the Project
-📌 Using MPLAB X
-
-Create two projects: HOST & CLIENT
-
-Add source files
-
-Set device: AVR128DD32
-
-Compiler flags:
-
-HOST → -DHOST_DEVICE
-
-CLIENT → -DCLIENT_DEVICE
-
-📌 Using avr-gcc (Command Line)
-
-HOST
-
-avr-gcc -mmcu=avr128dd32 -DF_CPU=32768UL -DHOST_DEVICE \
-  -Os -Wall -o host.elf \
-  host_main.c ports.c spi0.c adc.c main_clock_control.c \
-  sleep.c usart0_tx.c
-
-
-CLIENT
-
-avr-gcc -mmcu=avr128dd32 -DF_CPU=32768UL -DCLIENT_DEVICE \
-  -Os -Wall -o client.elf \
-  client_main.c ports.c spi0.c main_clock_control.c \
-  sleep.c usart0_tx.c
-
-🧪 Testing Procedure
-
-Flash both devices
-
-Open serial monitor on CLIENT (1200 baud, 8N1)
-
-Power devices
-
-Press button on HOST
-
-Observe output
-
-Example Output
-SPI Byte[1]: 0x8A
-SPI Byte[0]: 0xBC
-Results: 0x8ABC
-Window: 1
-ADC: 2748
-
-🐞 Troubleshooting Tips
-❌ CLIENT not receiving data
-
-Check SPI wiring
-
-Lower SPI speed (250 kHz)
-
-Add delay (spin_lock(4))
-
-❌ High sleep current
-
-Disable unused peripherals
-
-Enable pull-ups on unused pins
-
-Disconnect debugger
-
-❌ USART issues
-
-Check baud rate (1200)
-
-Verify F_CPU definitions
-
-Ensure correct terminal settings
-
-⚠️ Common Gotchas
-
-F_CPU redefine removed by optimizer → use spin_lock()
-
-1 MHz SPI too fast → use 250 kHz
-
-ADC window flag clears on read → check before reading
-
-📂 File Structure
-project/
-├── host/
-│   ├── main.c
-│   ├── ports.c/h
-│   ├── spi0.c/h
-│   ├── adc.c/h
-│   ├── main_clock_control.c/h
-│   ├── sleep.c/h
-│   └── usart0_tx.c/h
 │
-└── client/
-    ├── main.c
-    ├── ports.c/h
-    ├── spi0.c/h
-    ├── main_clock_control.c/h
-    ├── sleep.c/h
-    └── usart0_tx.c/h
+├── spi_connection/
+│   ├── PA4 (MOSI) → PA4 (MOSI)
+│   ├── PA5 (MISO) ← PA5 (MISO)
+│   ├── PA6 (SCK)  → PA6 (SCK)
+│   ├── PA7 (SS)   → PA7 (SS)
+│   └── GND        ↔ GND
+│
+└── host_sensor/
+    ├── PC3 → Sensor VCC
+    ├── PC2 → Sensor GND
+    └── PF2 ← Sensor Analog Out
+
+</span>
+
+
+---
+<h2><a class="anchor" id="project-structure"></a>Project Structure</h2>
+
+```
+vendor-performance-analysis/
+│
+├── README.md
+├── .gitignore
+├── requirements.txt
+├── Vendor Performance Report.pdf
+│
+├── notebooks/                  # Jupyter notebooks
+│   ├── exploratory_data_analysis.ipynb
+│   ├── vendor_performance_analysis.ipynb
+│
+├── scripts/                    # Python scripts for ingestion and processing
+│   ├── ingestion_db.py
+│   └── get_vendor_summary.py
+│
+├── dashboard/                  # Power BI dashboard file
+│   └── vendor_performance_dashboard.pbix
+```
+
+---
+<h2><a class="anchor" id="data-cleaning--preparation"></a>Data Cleaning & Preparation</h2>
+
+- Removed transactions with:
+  - Gross Profit ≤ 0
+  - Profit Margin ≤ 0
+  - Sales Quantity = 0
+- Created summary tables with vendor-level metrics
+- Converted data types, handled outliers, merged lookup tables
+
+---
+<h2><a class="anchor" id="exploratory-data-analysis-eda"></a>Exploratory Data Analysis (EDA)</h2>
+
+**Negative or Zero Values Detected:**
+- Gross Profit: Min -52,002.78 (loss-making sales)
+- Profit Margin: Min -∞ (sales at zero or below cost)
+- Unsold Inventory: Indicating slow-moving stock
+
+**Outliers Identified:**
+- High Freight Costs (up to 257K)
+- Large Purchase/Actual Prices
+
+**Correlation Analysis:**
+- Weak between Purchase Price & Profit
+- Strong between Purchase Qty & Sales Qty (0.999)
+- Negative between Profit Margin & Sales Price (-0.179)
+
+---
+<h2><a class="anchor" id="research-questions--key-findings"></a>Research Questions & Key Findings</h2>
+
+1. **Brands for Promotions**: 198 brands with low sales but high profit margins
+2. **Top Vendors**: Top 10 vendors = 65.69% of purchases → risk of over-reliance
+3. **Bulk Purchasing Impact**: 72% cost savings per unit in large orders
+4. **Inventory Turnover**: $2.71M worth of unsold inventory
+5. **Vendor Profitability**:
+   - High Vendors: Mean Margin = 31.17%
+   - Low Vendors: Mean Margin = 41.55%
+6. **Hypothesis Testing**: Statistically significant difference in profit margins → distinct vendor strategies
+
+---
+<h2><a class="anchor" id="dashboard"></a>Dashboard</h2>
+
+- Power BI Dashboard shows:
+  - Vendor-wise Sales and Margins
+  - Inventory Turnover
+  - Bulk Purchase Savings
+  - Performance Heatmaps
+
+![Vendor Performance Dashboard](images/dashboard.png)
+
+---
+<h2><a class="anchor" id="how-to-run-this-project"></a>How to Run This Project</h2>
+
+1. Clone the repository:
+```bash
+git clone https://github.com/yourusername/vendor-performance-analysis.git
+```
+3. Load the CSVs and ingest into database:
+```bash
+python scripts/ingestion_db.py
+```
+4. Create vendor summary table:
+```bash
+python scripts/get_vendor_summary.py
+```
+5. Open and run notebooks:
+   - `notebooks/exploratory_data_analysis.ipynb`
+   - `notebooks/vendor_performance_analysis.ipynb`
+6. Open Power BI Dashboard:
+   - `dashboard/vendor_performance_dashboard.pbix`
+
+---
+<h2><a class="anchor" id="final-recommendations"></a>Final Recommendations</h2>
+
+- Diversify vendor base to reduce risk
+- Optimize bulk order strategies
+- Reprice slow-moving, high-margin brands
+- Clear unsold inventory strategically
+- Improve marketing for underperforming vendors
+
+---
+<h2><a class="anchor" id="author--contact"></a>Author & Contact</h2>
+
+**Ayushi Mishra**  
+Data Analyst  
+📧 Email: techclasses0810@gmail.com  
+🔗 [LinkedIn](https://www.linkedin.com/in/ayushi-mishra-30813b174/)  
+🔗 [Portfolio](https://www.youtube.com/@techclasses0810/)
