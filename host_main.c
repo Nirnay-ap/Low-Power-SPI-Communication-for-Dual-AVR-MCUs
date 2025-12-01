@@ -1,10 +1,4 @@
-/*
- * AVR Bare Metal Series - Episode 14/15
- * HOST Device Implementation
- * 
- * Project: Low-power SPI communication with ADC reading
- * Hardware: AVR DD Curiosity Nano
- */
+
 
 #define F_CPU 32768UL  // 32.768 KHz for most of the time
 
