@@ -150,14 +150,12 @@ ADC: 2748
 
 Problem: CLIENT not receiving data
 
-
 1 .Check wiring: Verify SPI connections (especially GND)  
 2. Check SPI clock: Should be 250 kHz (not 1 MHz)  
 3. Add delay: Increase spin_lock(4) delay on HOST  
 
 
 Problem: High sleep current
-
 
 1. Disable unused peripherals: Ensure ADC/SPI disabled before sleep  
 2. Check floating pins: All unused pins should have pull-ups enabled  
