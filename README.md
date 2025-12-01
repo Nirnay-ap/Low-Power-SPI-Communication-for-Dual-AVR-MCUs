@@ -1,7 +1,7 @@
 
 # ⚡AVR Bare Metal SPI Communication Project
 
-This project implements ultra-low-power communication between two AVR DD microcontrollers using SPI protocol. The HOST device reads an ADC sensor and transmits data to the CLIENT device, which outputs the results via USART.
+Low-power communication between two AVR DD microcontrollers using SPI protocol.  
 
 ---
 
@@ -13,7 +13,6 @@ This project implements ultra-low-power communication between two AVR DD microco
 - <a href="#Software Architecture">Software Architecture</a>
 - <a href="#SPI data packet format">SPI data packet format</a>
 - <a href="#Power consumption">Power consumption</a>
-- <a href="#Building the project">Building the project</a>
 - <a href="#Testing">Testing</a>
 - <a href="#Troubleshoot">Troubleshoot</a>
 - <a href="#File structure">File structure</a>
@@ -130,31 +129,7 @@ Using MPLAB X IDE:
 1.Create two separate projects (HOST and CLIENT)
 2.Add source and header files to each project
 3.Set device to AVR128DD32 (or your specific AVR DD variant)
-4.Build and program each device
 
-  Using Command Line (avr-gcc):
-  For HOST:
-  ```
-  avr-gcc -mmcu=avr128dd32 -DF_CPU=32768UL -DHOST_DEVICE \
-  -Os -Wall -o host.elf \
-  host_main.c ports.c spi0.c adc.c main_clock_control.c \
-  sleep.c usart0_tx.c
-
-  avr-objcopy -O ihex -R .eeprom host.elf host.hex
-  avrdude -c atmelice_updi -p avr128dd32 -U flash:w:host.hex
-
-  ```
-For CLIENT:
-   ```
-  avr-gcc -mmcu=avr128dd32 -DF_CPU=32768UL -DCLIENT_DEVICE \
-  -Os -Wall -o client.elf \
-  client_main.c ports.c spi0.c main_clock_control.c \
-  sleep.c usart0_tx.c
-
-  avr-objcopy -O ihex -R .eeprom client.elf client.hex
-  avrdude -c atmelice_updi -p avr128dd32 -U flash:w:client.hex
-   ```    
-  ---
   
 <h2><a class="Testing" id="dashboard"></a>Testing</h2>
 
@@ -168,30 +143,39 @@ For CLIENT:
 ```
 <h2><a class="Output" id="dashboard"></a>Output</h2>
 
-![SPI_RESULT](https://github.com/Nirnay-ap/Low-Power-SPI-Communication-for-Dual-AVR-MCUs/blob/main/Spi_result.png)
-
+```
+SPI Byte[1]: 0x8A
+SPI Byte[0]: 0xBC
+Results: 0x8ABC
+Window: 1
+ADC: 2748
+```
 
 ---
 <h2><a class="anchor" id="Troubleshoot"></a>Troubleshoot</h2>
 
 Problem: CLIENT not receiving data
 
-
+```
 1.Check wiring: Verify SPI connections (especially GND)
 2.Check SPI clock: Should be 250 kHz (not 1 MHz)
 3.Add delay: Increase spin_lock(4) delay on HOST
+```
 
 Problem: High sleep current
 
+```
 1.Disable unused peripherals: Ensure ADC/SPI disabled before sleep
 2.Check floating pins: All unused pins should have pull-ups enabled
 3.Disconnect debugger: Logic analyzers add significant current
+```
 
 Problem: USART not working
-
+```
 1.Check baud rate: Must match 1200 baud
 2.Check terminal settings: 8 data bits, no parity, 1 stop bit
 3.Verify F_CPU: Must be defined correctly for USART calculations
+```
 
 ---
 <h2><a class="anchor" id="File structure"></a>File structure</h2>
