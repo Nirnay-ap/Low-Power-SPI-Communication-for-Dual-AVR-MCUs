@@ -166,8 +166,9 @@ For CLIENT:
 4.Press button on HOST device
 5.Observe output on CLIENT's serial terminal
 ```
+<h2><a class="Output" id="dashboard"></a>Output</h2>
 
-<div id="header" align="center"> <img src="SPI_Rsult.png" width="750"/> </div>
+![SPI_RESULT](spi_result.png)
 
 
 ---
