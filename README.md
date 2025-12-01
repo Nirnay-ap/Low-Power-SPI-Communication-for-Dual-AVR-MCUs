@@ -1,7 +1,7 @@
 
 # ⚡AVR Bare Metal SPI Communication Project
 
-Low-power,bare-metal AVR DD project enabling seamless SPI communication between two microcontrollers with ADC sensing and USART output
+This project implements ultra-low-power communication between two AVR DD microcontrollers using SPI protocol. The HOST device reads an ADC sensor and transmits data to the CLIENT device, which outputs the results via USART.
 
 ---
 
