@@ -17,20 +17,20 @@ Low-power,bare-metal AVR DD project enabling seamless SPI communication between 
 - <a href="#Testing">Testing</a>
 - <a href="#Troubleshoot">Troubleshoot</a>
 - <a href="#File structure">File structure</a>
-- <a href="#author--contact">Author & Contact</a>
+
 
 ---
 <h2><a class="anchor" id="overview"></a>Overview</h2>
 
-This project implements ultra-low-power communication between two AVR DD microcontrollers using SPI protocol. The HOST device reads an ADC sensor and transmits data to the CLIENT device, which outputs the results via USART.
+This project implements low-power communication between two AVR DD microcontrollers using SPI protocol. The HOST device reads an ADC sensor and transmits data to the CLIENT device, which outputs the results via USART.
 
 <h2><a class="anchor" id="Key features"></a>Key features</h2>
 
--Ultra-low power consumption (~1.5µA sleep current)
--State machine-based architecture
--Dynamic clock switching (32.768 kHz ↔ 4 MHz)
--Window comparison ADC
--Interrupt-driven SPI communication
+1.Ultra-low power consumption (~1.5µA sleep current)
+2.State machine-based architecture
+3.Dynamic clock switching (32.768 kHz ↔ 4 MHz)
+4.Window comparison ADC
+5.Interrupt-driven SPI communication
 
 ---
 <h2><a class="anchor" id="Hardware requirements"></a>Hardware requirements</h2>
