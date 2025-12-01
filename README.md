@@ -38,6 +38,7 @@ This project implements low-power communication between two AVR DD microcontroll
 ---
 <h2><a class="anchor" id="Hardware requirements"></a>Hardware requirements</h2>
 
+```
 Both Devices:
 
 -2x AVR DD Curiosity Nano Development Boards
@@ -48,7 +49,7 @@ HOST Device Additional:
 
 -Analog sensor (connected to PF2)
 -Button switch (built-in on PF6)
----
+```
 
 <h2><a class="anchor" id="Wiring diagram"></a>Wiring diagram</h2>
 
@@ -72,6 +73,7 @@ HOST Sensor:
 
 HOST State Machine:
 
+```
 1.INIT → Initialize peripherals
 2.SLEEP → Power-down mode (~1.5µA)
 3.SWITCH_TO_HIGHSPEED → 4 MHz clock
@@ -79,9 +81,11 @@ HOST State Machine:
 5.SEND_SPI → Transmit 2 bytes to CLIENT
 6.SWITCH_TO_LOWPOWER → 32.768 kHz clock
 7.SLEEP → Return to power-down
+```
 
 CLIENT State Machine:
 
+```
 1.INIT → Initialize peripherals
 2.SLEEP → Power-down mode (~2µA)
 3.SWITCH_TO_HIGHSPEED → 4 MHz clock
@@ -89,6 +93,7 @@ CLIENT State Machine:
 5.SWITCH_TO_LOWPOWER → 32.768 kHz clock
 6.WRITE_TO_USART → Output formatted data
 7.SLEEP → Return to power-down
+```
 
 ---
 <h2><a class="anchor" id="SPI data packet format"></a>SPI data packet format</h2>
@@ -100,9 +105,9 @@ Byte 1 (High):  [W][A11][A10][A9][A8][A7][A6][A5]
 Byte 0 (Low):   [A4][A3][A2][A1][A0][X][X][X]
 
 Where:
-  W   = Window comparison result (1=satisfied, 0=not satisfied)
-  A11-A0 = 12-bit ADC result
-  X   = Unused bits
+W = Window comparison result (1=satisfied, 0=not satisfied)
+A11-A0 = 12-bit ADC result
+X = Unused bits
 ```
 ---
 <h2><a class="anchor" id="Power Consumption"></a>Power Consumption</h2>
@@ -126,6 +131,7 @@ Using MPLAB X IDE:
 2.Add source and header files to each project
 3.Set device to AVR128DD32 (or your specific AVR DD variant)
 4.Build and program each device
+
   Using Command Line (avr-gcc):
   For HOST:
   ```
@@ -152,19 +158,23 @@ For CLIENT:
   
 <h2><a class="Testing" id="dashboard"></a>Testing</h2>
 
+
+```
 1.Program both devices with their respective firmware
 2.Connect USART from CLIENT to terminal (1200 baud, 8N1)
 3.Power both devices (3.3V recommended)
 4.Press button on HOST device
 5.Observe output on CLIENT's serial terminal
+```
 
-![Vendor Performance Dashboard](<img width="1082" height="1020" alt="SPI_Rsult" src="https://github.com/user-attachments/assets/1482f12b-2a81-482e-88dc-9d7dc3edc14c" />
-)
+
+![SPI RESULT](<img width="1082" height="1020" alt="SPI_Rsult" src="https://github.com/user-attachments/assets/c3fc0005-c445-4fa7-a4d6-45aa80b60ba8" />)
 
 ---
 <h2><a class="anchor" id="Troubleshoot"></a>Troubleshoot</h2>
 
 Problem: CLIENT not receiving data
+
 
 1.Check wiring: Verify SPI connections (especially GND)
 2.Check SPI clock: Should be 250 kHz (not 1 MHz)
