@@ -10,14 +10,14 @@
 ## 📌 Table of Contents
 - <a href="#overview">overview</a>
 - <a href="#Key-features">Key-features</a>
-- <a href="#Hardware requirements">Hardware requirements</a>
-- <a href="#Wiring diagram">Wiring diagram</a>
-- <a href="#Software Architecture">Software Architecture</a>
-- <a href="#SPI data packet format">SPI data packet format</a>
-- <a href="#Power consumption">Power consumption</a>
+- <a href="#Hardware-requirements">Hardware-requirements</a>
+- <a href="#Wiring-diagram">Wiring-diagram</a>
+- <a href="#Software-Architecture">Software-Architecture</a>
+- <a href="#SPI-data-packet-format">SPI-data-packet-format</a>
+- <a href="#Power-Consumption">Power-Consumption</a>
 - <a href="#Testing">Testing</a>
 - <a href="#Troubleshoot">Troubleshoot</a>
-- <a href="#File structure">File structure</a>
+- <a href="#File-structure">File-structure</a>
 
 
 ---
@@ -37,7 +37,7 @@ This project implements low-power communication between two AVR DD microcontroll
 ```
 
 ---
-<h2><a class="anchor" id="Hardware requirements"></a>Hardware requirements</h2>
+<h2><a class="anchor" id="Hardware-requirements"></a>Hardware-requirements</h2>
 
 ```
 Both Devices:
@@ -52,7 +52,7 @@ HOST Device Additional:
 -Button switch (built-in on PF6)
 ```
 
-<h2><a class="anchor" id="Wiring diagram"></a>Wiring diagram</h2>
+<h2><a class="anchor" id="Wiring-diagram"></a>Wiring-diagram</h2>
 
 ```
 HOST (PA4-PA7)  ←→  CLIENT (PA4-PA7)
@@ -70,7 +70,7 @@ HOST Sensor:
 
 
 ---
-<h2><a class="anchor" id="Software Architecture"></a>Software Architecture</h2>
+<h2><a class="anchor" id="Software-Architecture"></a>Software-Architecture</h2>
 
 HOST State Machine:
 
@@ -97,7 +97,7 @@ CLIENT State Machine:
 ```
 
 ---
-<h2><a class="anchor" id="SPI data packet format"></a>SPI data packet format</h2>
+<h2><a class="anchor" id="SPI-data-packet-format"></a>SPI-data-packet-format</h2>
 
 2-byte packet structure:
 
@@ -111,7 +111,7 @@ A11-A0 = 12-bit ADC result
 X = Unused bits
 ```
 ---
-<h2><a class="anchor" id="Power Consumption"></a>Power Consumption</h2>
+<h2><a class="anchor" id="Powe-Consumption"></a>Power-Consumption</h2>
 ## 
 
 | Device | State            | Current | Clock      |
@@ -124,16 +124,9 @@ X = Unused bits
 
 
 ---
-<h2><a class="anchor" id="Building the project"></a>Building the project</h2>
-
-Using MPLAB X IDE:
-
-1.Create two separate projects (HOST and CLIENT)
-2.Add source and header files to each project
-3.Set device to AVR128DD32 (or your specific AVR DD variant)
 
   
-<h2><a class="Testing" id="dashboard"></a>Testing</h2>
+<h2><a class="anchor" id="Testing"></a>Testing</h2>
 
 
 ```
@@ -143,7 +136,7 @@ Using MPLAB X IDE:
 4.Press button on HOST device
 5.Observe output on CLIENT's serial terminal
 ```
-<h2><a class="Output" id="dashboard"></a>Output</h2>
+<h2><a class="anchor" id="Output"></a>Output</h2>
 
 ```
 SPI Byte[1]: 0x8A
@@ -180,7 +173,7 @@ Problem: USART not working
 ```
 
 ---
-<h2><a class="anchor" id="File structure"></a>File structure</h2>
+<h2><a class="anchor" id="File-structure"></a>File-structure</h2>
 
  ```
 project/
