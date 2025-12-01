@@ -30,9 +30,13 @@ This project implements low-power communication between two AVR DD microcontroll
 
 
 1.Ultra-low power consumption (~1.5µA sleep current)
+
 2.State machine-based architecture
+
 3.Dynamic clock switching (32.768 kHz ↔ 4 MHz)
+
 4.Window comparison ADC
+
 5.Interrupt-driven SPI communication
 
 
