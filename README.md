@@ -10,7 +10,7 @@ _Low-power, bare-metal AVR DD project enabling seamless SPI communication betwee
 - <a href="#Key features">Key features</a>
 - <a href="#Hardware requirements">Hardware requirements</a>
 - <a href="#Wiring diagram">Wiring diagram</a>
-- <a href="#Software Structure">Software Structure</a>
+- <a href="#Software Architecture">Software Architecture</a>
 - <a href="#SPI data packet format">SPI data packet format</a>
 - <a href="#Power consumption">Power consumption</a>
 - <a href="#Building the project">Building the project</a>
@@ -22,7 +22,7 @@ _Low-power, bare-metal AVR DD project enabling seamless SPI communication betwee
 ---
 <h2><a class="anchor" id="overview"></a>Overview</h2>
 
-This project implements ultra-low-power communication between two AVR DD microcontrollers using SPI protocol. The HOST device reads an ADC sensor and transmits data to the CLIENT device, which outputs the results via USART.
+This project implements an ultra-low-power SPI communication system between two AVR DD microcontrollers, where the HOST reads an ADC sensor and the CLIENT outputs the data via USART.
 ---
 <h2><a class="anchor" id="Key features"></a>Key features</h2>
 
@@ -49,133 +49,158 @@ HOST Device Additional:
 
 <h2><a class="anchor" id="Wiring diagram"></a>Wiring diagram</h2>
 
-<span style="color:gray">
-
-
-│
-├── spi_connection/
-│   ├── PA4 (MOSI) → PA4 (MOSI)
-│   ├── PA5 (MISO) ← PA5 (MISO)
-│   ├── PA6 (SCK)  → PA6 (SCK)
-│   ├── PA7 (SS)   → PA7 (SS)
-│   └── GND        ↔ GND
-│
-└── host_sensor/
-    ├── PC3 → Sensor VCC
-    ├── PC2 → Sensor GND
-    └── PF2 ← Sensor Analog Out
-
-</span>
-
-
----
-<h2><a class="anchor" id="project-structure"></a>Project Structure</h2>
-
 ```
-vendor-performance-analysis/
-│
-├── README.md
-├── .gitignore
-├── requirements.txt
-├── Vendor Performance Report.pdf
-│
-├── notebooks/                  # Jupyter notebooks
-│   ├── exploratory_data_analysis.ipynb
-│   ├── vendor_performance_analysis.ipynb
-│
-├── scripts/                    # Python scripts for ingestion and processing
-│   ├── ingestion_db.py
-│   └── get_vendor_summary.py
-│
-├── dashboard/                  # Power BI dashboard file
-│   └── vendor_performance_dashboard.pbix
+HOST (PA4-PA7)  ←→  CLIENT (PA4-PA7)
+    PA4 (MOSI)  →   PA4 (MOSI)
+    PA5 (MISO)  ←   PA5 (MISO)
+    PA6 (SCK)   →   PA6 (SCK)
+    PA7 (SS)    →   PA7 (SS)
+    GND         ←→  GND
+
+HOST Sensor:
+    PC3         →   Sensor VCC
+    PC2         →   Sensor GND
+    PF2         ←   Sensor Analog Out
 ```
 
----
-<h2><a class="anchor" id="data-cleaning--preparation"></a>Data Cleaning & Preparation</h2>
-
-- Removed transactions with:
-  - Gross Profit ≤ 0
-  - Profit Margin ≤ 0
-  - Sales Quantity = 0
-- Created summary tables with vendor-level metrics
-- Converted data types, handled outliers, merged lookup tables
 
 ---
-<h2><a class="anchor" id="exploratory-data-analysis-eda"></a>Exploratory Data Analysis (EDA)</h2>
+<h2><a class="anchor" id="Software Architecture"></a>Software Architecture</h2>
 
-**Negative or Zero Values Detected:**
-- Gross Profit: Min -52,002.78 (loss-making sales)
-- Profit Margin: Min -∞ (sales at zero or below cost)
-- Unsold Inventory: Indicating slow-moving stock
+HOST State Machine:
 
-**Outliers Identified:**
-- High Freight Costs (up to 257K)
-- Large Purchase/Actual Prices
+1.INIT → Initialize peripherals
+2.SLEEP → Power-down mode (~1.5µA)
+3.SWITCH_TO_HIGHSPEED → 4 MHz clock
+4.READ_ADC → Sample sensor with window comparison
+5.SEND_SPI → Transmit 2 bytes to CLIENT
+6.SWITCH_TO_LOWPOWER → 32.768 kHz clock
+7.SLEEP → Return to power-down
 
-**Correlation Analysis:**
-- Weak between Purchase Price & Profit
-- Strong between Purchase Qty & Sales Qty (0.999)
-- Negative between Profit Margin & Sales Price (-0.179)
+CLIENT State Machine:
 
----
-<h2><a class="anchor" id="research-questions--key-findings"></a>Research Questions & Key Findings</h2>
-
-1. **Brands for Promotions**: 198 brands with low sales but high profit margins
-2. **Top Vendors**: Top 10 vendors = 65.69% of purchases → risk of over-reliance
-3. **Bulk Purchasing Impact**: 72% cost savings per unit in large orders
-4. **Inventory Turnover**: $2.71M worth of unsold inventory
-5. **Vendor Profitability**:
-   - High Vendors: Mean Margin = 31.17%
-   - Low Vendors: Mean Margin = 41.55%
-6. **Hypothesis Testing**: Statistically significant difference in profit margins → distinct vendor strategies
+1.INIT → Initialize peripherals
+2.SLEEP → Power-down mode (~2µA)
+3.SWITCH_TO_HIGHSPEED → 4 MHz clock
+4.RECEIVE_SPI → Collect 2 bytes from HOST
+5.SWITCH_TO_LOWPOWER → 32.768 kHz clock
+6.WRITE_TO_USART → Output formatted data
+7.SLEEP → Return to power-down
 
 ---
-<h2><a class="anchor" id="dashboard"></a>Dashboard</h2>
+<h2><a class="anchor" id="SPI data packet format"></a>SPI data packet format</h2>
 
-- Power BI Dashboard shows:
-  - Vendor-wise Sales and Margins
-  - Inventory Turnover
-  - Bulk Purchase Savings
-  - Performance Heatmaps
+2-byte packet structure:
 
-![Vendor Performance Dashboard](images/dashboard.png)
-
----
-<h2><a class="anchor" id="how-to-run-this-project"></a>How to Run This Project</h2>
-
-1. Clone the repository:
-```bash
-git clone https://github.com/yourusername/vendor-performance-analysis.git
 ```
-3. Load the CSVs and ingest into database:
-```bash
-python scripts/ingestion_db.py
+Byte 1 (High):  [W][A11][A10][A9][A8][A7][A6][A5]
+Byte 0 (Low):   [A4][A3][A2][A1][A0][X][X][X]
+
+Where:
+  W   = Window comparison result (1=satisfied, 0=not satisfied)
+  A11-A0 = 12-bit ADC result
+  X   = Unused bits
 ```
-4. Create vendor summary table:
-```bash
-python scripts/get_vendor_summary.py
-```
-5. Open and run notebooks:
-   - `notebooks/exploratory_data_analysis.ipynb`
-   - `notebooks/vendor_performance_analysis.ipynb`
-6. Open Power BI Dashboard:
-   - `dashboard/vendor_performance_dashboard.pbix`
+---
+<h2><a class="anchor" id="Power Consumption"></a>Power Consumption</h2>
+## 
+
+| Device | State            | Current | Clock      |
+|--------|------------------|---------|------------|
+| HOST   | Sleep            | ~1.5µA  | 32.768 kHz |
+| HOST   | ADC              | ~160µA  | 4 MHz      |
+| HOST   | SPI TX           | ~1.3mA  | 4 MHz      |
+| CLIENT | Sleep            | ~2µA    | 32.768 kHz |
+| CLIENT | SPI RX + USART   | ~1.1mA  | 4 MHz      |
+
 
 ---
-<h2><a class="anchor" id="final-recommendations"></a>Final Recommendations</h2>
+<h2><a class="anchor" id="Building the project"></a>Building the project</h2>
 
-- Diversify vendor base to reduce risk
-- Optimize bulk order strategies
-- Reprice slow-moving, high-margin brands
-- Clear unsold inventory strategically
-- Improve marketing for underperforming vendors
+Using MPLAB X IDE:
+
+1.Create two separate projects (HOST and CLIENT)
+2.Add source and header files to each project
+3.Set device to AVR128DD32 (or your specific AVR DD variant)
+4.Build and program each device
+  Using Command Line (avr-gcc):
+  For HOST:
+  ```
+  avr-gcc -mmcu=avr128dd32 -DF_CPU=32768UL -DHOST_DEVICE \
+  -Os -Wall -o host.elf \
+  host_main.c ports.c spi0.c adc.c main_clock_control.c \
+  sleep.c usart0_tx.c
+
+  avr-objcopy -O ihex -R .eeprom host.elf host.hex
+  avrdude -c atmelice_updi -p avr128dd32 -U flash:w:host.hex
+
+  ```
+For CLIENT:
+   ```
+  avr-gcc -mmcu=avr128dd32 -DF_CPU=32768UL -DCLIENT_DEVICE \
+  -Os -Wall -o client.elf \
+  client_main.c ports.c spi0.c main_clock_control.c \
+  sleep.c usart0_tx.c
+
+  avr-objcopy -O ihex -R .eeprom client.elf client.hex
+  avrdude -c atmelice_updi -p avr128dd32 -U flash:w:client.hex
+   ```    
+  ---
+  
+<h2><a class="Testing" id="dashboard"></a>Testing</h2>
+
+1.Program both devices with their respective firmware
+2.Connect USART from CLIENT to terminal (1200 baud, 8N1)
+3.Power both devices (3.3V recommended)
+4.Press button on HOST device
+5.Observe output on CLIENT's serial terminal
+
+![Vendor Performance Dashboard](<img width="1082" height="1020" alt="SPI_Rsult" src="https://github.com/user-attachments/assets/1482f12b-2a81-482e-88dc-9d7dc3edc14c" />
+)
 
 ---
-<h2><a class="anchor" id="author--contact"></a>Author & Contact</h2>
+<h2><a class="anchor" id="Troubleshoot"></a>Troubleshoot</h2>
 
-**Ayushi Mishra**  
-Data Analyst  
-📧 Email: techclasses0810@gmail.com  
-🔗 [LinkedIn](https://www.linkedin.com/in/ayushi-mishra-30813b174/)  
-🔗 [Portfolio](https://www.youtube.com/@techclasses0810/)
+Problem: CLIENT not receiving data
+
+1.Check wiring: Verify SPI connections (especially GND)
+2.Check SPI clock: Should be 250 kHz (not 1 MHz)
+3.Add delay: Increase spin_lock(4) delay on HOST
+
+Problem: High sleep current
+
+1.Disable unused peripherals: Ensure ADC/SPI disabled before sleep
+2.Check floating pins: All unused pins should have pull-ups enabled
+3.Disconnect debugger: Logic analyzers add significant current
+
+Problem: USART not working
+
+1.Check baud rate: Must match 1200 baud
+2.Check terminal settings: 8 data bits, no parity, 1 stop bit
+3.Verify F_CPU: Must be defined correctly for USART calculations
+
+---
+<h2><a class="anchor" id="File structure"></a>File structure</h2>
+
+ ```
+project/
+├── host/
+│   ├── main.c              (HOST state machine)
+│   ├── ports.c/h           (GPIO + button interrupt)
+│   ├── spi0.c/h            (SPI host mode)
+│   ├── adc.c/h             (ADC with window compare)
+│   ├── main_clock_control.c/h
+│   ├── sleep.c/h
+│   └── usart0_tx.c/h       (optional for debugging)
+│
+└── client/
+    ├── main.c              (CLIENT state machine)
+    ├── ports.c/h           (GPIO + SS interrupt)
+    ├── spi0.c/h            (SPI client mode)
+    ├── main_clock_control.c/h
+    ├── sleep.c/h
+    └── usart0_tx.c/h       (serial output)
+ ```  
+
+---
+
