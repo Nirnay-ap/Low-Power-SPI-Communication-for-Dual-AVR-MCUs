@@ -167,8 +167,8 @@ For CLIENT:
 5.Observe output on CLIENT's serial terminal
 ```
 
+<div id="header" align="center"> <img src="SPI_Rsult.png" width="750"/> </div>
 
-![SPI RESULT](<img width="1082" height="1020" alt="SPI_Rsult" src="https://github.com/user-attachments/assets/c3fc0005-c445-4fa7-a4d6-45aa80b60ba8" />)
 
 ---
 <h2><a class="anchor" id="Troubleshoot"></a>Troubleshoot</h2>
