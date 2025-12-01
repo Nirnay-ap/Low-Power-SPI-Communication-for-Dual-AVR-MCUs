@@ -1,7 +1,7 @@
 
-# ⚡AVR Bare Metal SPI Communication Project
+# 🧾AVR Bare Metal SPI Communication Project
 
-Low-power communication between two AVR DD microcontrollers using SPI protocol.  
+*Low-power communication between two AVR DD microcontrollers using SPI protocol*.  
 
 <div id="header" align="LEFT"> <img src="SPI_WIRING.png" width="900"/> </div>
 
