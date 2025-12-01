@@ -3,7 +3,7 @@
 
 Low-power communication between two AVR DD microcontrollers using SPI protocol.  
 
-<div id="header" align="center"> <img src="SPI_WIRING.png" width="75"/> </div>
+<div id="header" align="center"> <img src="SPI_WIRING.png" width="500"/> </div>
 
 ---
 
