@@ -8,7 +8,7 @@
 ---
 
 ## 📌 Table of Contents
-- <a href="#overview">Overview</a>
+- <a href="#overview">overview</a>
 - <a href="#Key features">Key features</a>
 - <a href="#Hardware requirements">Hardware requirements</a>
 - <a href="#Wiring diagram">Wiring diagram</a>
@@ -21,7 +21,7 @@
 
 
 ---
-<h2><a class="anchor" id="overview"></a>Overview</h2>
+<h2><a class="anchor" id="overview"></a>overview</h2>
 
 This project implements low-power communication between two AVR DD microcontrollers using SPI protocol. The HOST device reads an ADC sensor and transmits data to the CLIENT device, which outputs the results via USART.
 
