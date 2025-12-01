@@ -168,7 +168,7 @@ For CLIENT:
 ```
 <h2><a class="Output" id="dashboard"></a>Output</h2>
 
-![SPI_RESULT](spi_result.png)
+![SPI_RESULT](https://github.com/Nirnay-ap/Low-Power-SPI-Communication-for-Dual-AVR-MCUs/blob/main/Spi_result.png)
 
 
 ---
