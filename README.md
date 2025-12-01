@@ -42,14 +42,14 @@ This project implements low-power communication between two AVR DD microcontroll
 
 Both Devices:
 
--2x AVR DD Curiosity Nano Development Boards  
--USB cables for programming and power  
--Logic analyzer (optional, for debugging)  
+1. 2x AVR DD Curiosity Nano Development Boards  
+2. USB cables for programming and power  
+3. Logic analyzer (optional, for debugging)  
 
 HOST Device Additional:
 
--Analog sensor (connected to PF2)  
--Button switch (built-in on PF6)
+1. Analog sensor (connected to PF2)  
+2. Button switch (built-in on PF6)
 
 <h2><a class="anchor" id="Wiring-diagram"></a>Wiring-diagram</h2>
 
