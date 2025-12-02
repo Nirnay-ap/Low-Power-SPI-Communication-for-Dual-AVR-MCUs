@@ -1,3 +1,6 @@
+//USER
+// PORT.h  
+
 #ifndef PORTS_H
 #define PORTS_H
 
@@ -127,14 +130,8 @@ void usart0_send_string(const char *str);
 #endif // USART0_TX_H
 
 
-Client
-/*
- * AVR Bare Metal Series - Episode 14/15
- * CLIENT Device Implementation
- * 
- * Project: Low-power SPI communication with USART output
- * Hardware: AVR DD Curiosity Nano
- */
+//Client
+
 
 #define F_CPU 32768UL  // 32.768 KHz for most of the time
 
